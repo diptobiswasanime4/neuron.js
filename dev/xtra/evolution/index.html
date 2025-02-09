@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evolution</title>
+    <style>
+      body {
+        background-color: black;
+        display: flex;
+        gap: 10px;
+      }
+      canvas {
+        background-color: wheat;
+      }
+      .controller {
+        background-color: whitesmoke;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      table {
+        width: 100%;
+        background-color: white;
+        color: black;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 2px solid black;
+        height: 30px;
+        width: 100px;
+        padding: 5px;
+        text-align: center;
+      }
+      label {
+        display: flex;
+        justify-content: space-between;
+      }
+      button {
+        background-color: blue;
+        color: white;
+        font-size: 1.1rem;
+        border: none;
+        padding: 5px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      button:hover {
+        opacity: 75%;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style></style>
+  </head>
+  <body>
+    <canvas></canvas>
+    <div class="controller">
+      <label
+        >Speed <input type="range" id="speed" min="1" max="5" value="2"
+      /></label>
+      <label
+        >Life <input type="range" id="life" min="100" max="1000" value="500"
+      /></label>
+      <label
+        >Plant Regrowth Time
+        <input type="range" id="regrowth" min="10" max="200" value="50"
+      /></label>
+      <label
+        >Radius <input type="range" id="radius" min="2" max="10" value="5"
+      /></label>
+      <label
+        >Initial Blue Count
+        <input type="number" id="blueCount" min="1" value="50"
+      /></label>
+      <label
+        >Initial Red Count <input type="number" id="redCount" min="1" value="5"
+      /></label>
+      <label
+        >Initial Green Count
+        <input type="number" id="greenCount" min="1" value="5"
+      /></label>
+      <table>
+        <tr>
+          <th>Blue</th>
+          <th>Red</th>
+          <th>Green</th>
+        </tr>
+        <tr>
+          <td id="greenCountDisplay">0</td>
+          <td id="blueCountDisplay">0</td>
+          <td id="redCountDisplay">0</td>
+        </tr>
+      </table>
+      <button>Start</button>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- <canvas id="chartCanvas" width="400" height="200"></canvas> -->
+  </body>
+</html>
