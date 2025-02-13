@@ -1,4 +1,5 @@
 import data from "./data.js";
+import fs from "fs";
 
 let inputCount = 2;
 let hiddenCount = 3;
@@ -111,3 +112,12 @@ for (let i = 0; i < data.length; i++) {
 }
 
 console.log(data.length);
+
+const weightsData = {
+  hiddenWeights,
+  hiddenBias,
+  outputWeights,
+  outputBias,
+};
+
+fs.writeFileSync("weights.json", JSON.stringify(weightsData, null, 2), "utf-8");
