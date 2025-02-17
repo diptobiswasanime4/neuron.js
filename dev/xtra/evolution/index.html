@@ -71,15 +71,16 @@
         >Radius <input type="range" id="radius" min="2" max="10" value="5"
       /></label>
       <label
-        >Initial Blue Count
-        <input type="number" id="blueCount" min="1" value="50"
-      /></label>
-      <label
-        >Initial Red Count <input type="number" id="redCount" min="1" value="5"
-      /></label>
-      <label
         >Initial Green Count
-        <input type="number" id="greenCount" min="1" value="5"
+        <input type="number" id="initGreenCount" min="1" value="50"
+      /></label>
+      <label
+        >Initial Blue Count
+        <input type="number" id="initBlueCount" min="1" value="50"
+      /></label>
+      <label
+        >Initial Red Count
+        <input type="number" id="initRedCount" min="1" value="5"
       /></label>
       <table>
         <tr>
@@ -93,7 +94,7 @@
           <td id="redCountDisplay">0</td>
         </tr>
       </table>
-      <button>Start</button>
+      <button id="startBtn">Start</button>
     </div>
 
     <script src="script.js"></script>

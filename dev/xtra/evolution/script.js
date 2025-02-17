@@ -11,15 +11,15 @@ const life = document.getElementById("life").value;
 const regrowth = document.getElementById("regrowth").value;
 const radius = document.getElementById("radius").value;
 
+const initGreenCount = document.getElementById("initGreenCount").value;
+const initBlueCount = document.getElementById("initBlueCount").value;
+const initRedCount = document.getElementById("initRedCount").value;
+
 const greenCount = document.getElementById("greenCountDisplay");
 const blueCount = document.getElementById("blueCountDisplay");
 const redCount = document.getElementById("redCountDisplay");
 
-let lifeCount = {
-  greenCount: 50,
-  blueCount: 50,
-  redCount: 5,
-};
+const startBtn = document.getElementById("startBtn");
 
 class Particle {
   constructor(x, y, color) {
@@ -61,95 +61,6 @@ class Particle {
   }
 }
 
-let particles = [];
-
-for (let i = 0; i < 50; i++) {
-  let x = Math.random() * canvas.width;
-  let y = Math.random() * canvas.height;
-  particles.push(new Particle(x, y, "green"));
-}
-
-for (let i = 0; i < 50; i++) {
-  let x = Math.random() * canvas.width;
-  let y = Math.random() * canvas.height;
-  particles.push(new Particle(x, y, "blue"));
-}
-
-for (let i = 0; i < 5; i++) {
-  x = Math.random() * canvas.width;
-  y = Math.random() * canvas.height;
-  particles.push(new Particle(x, y, "red"));
-}
-
-setInterval(() => {
-  let x = Math.random() * canvas.width;
-  let y = Math.random() * canvas.height;
-  particles.push(new Particle(x, y, "green"));
-  lifeCount.greenCount++;
-}, 100);
-
-function animate() {
-  requestAnimationFrame(animate);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  console.log(lifeCount);
-
-  greenCount.textContent = lifeCount.greenCount;
-  blueCount.textContent = lifeCount.blueCount;
-  redCount.textContent = lifeCount.redCount;
-
-  for (let i1 = particles.length - 1; i1 >= 0; i1--) {
-    let p1 = particles[i1];
-    p1.update(ctx);
-
-    if (p1.life <= 0) {
-      particles.splice(i1, 1);
-      if (p1.color == "blue") {
-        lifeCount.blueCount--;
-      } else if (p1.color == "green") {
-        lifeCount.greenCount--;
-      } else if (p1.color == "red") {
-        lifeCount.redCount--;
-      }
-      continue;
-    }
-
-    for (let i2 = particles.length - 1; i2 >= 0; i2--) {
-      if (i1 === i2) continue;
-      let p2 = particles[i2];
-
-      let dist = distanceBetweenTwoParticles(p1, p2);
-      if (dist.dist < p1.radius) {
-        if (p1.color == "blue" && p2.color == "green") {
-          particles.splice(i2, 1);
-          particles.push(new Particle(p1.x, p1.y, "blue"));
-
-          lifeCount.greenCount--;
-          lifeCount.blueCount++;
-
-          p1.life = 500;
-          p1.foodConsumed = 0;
-        } else if (p1.color == "blue" && p2.color == "red") {
-          particles.splice(i1, 1);
-          lifeCount.blueCount--;
-
-          p2.life = 500;
-          p2.foodConsumed++;
-
-          if (p2.foodConsumed == 3) {
-            particles.push(new Particle(p2.x, p2.y, "red"));
-            lifeCount.redCount++;
-            p2.foodConsumed = 0;
-          }
-          break;
-        }
-      }
-    }
-  }
-}
-
-animate();
-
 function distanceBetweenTwoParticles(p1, p2) {
   let xDist = p2.x - p1.x;
   let yDist = p2.y - p1.y;
@@ -157,3 +68,100 @@ function distanceBetweenTwoParticles(p1, p2) {
   let dist = Math.sqrt(sqDist);
   return { dist, xDist, yDist };
 }
+
+startBtn.addEventListener("click", () => {
+  let lifeCount = {
+    greenCount: initGreenCount,
+    blueCount: initBlueCount,
+    redCount: initRedCount,
+  };
+
+  let particles = [];
+
+  for (let i = 0; i < lifeCount.greenCount; i++) {
+    let x = Math.random() * canvas.width;
+    let y = Math.random() * canvas.height;
+    particles.push(new Particle(x, y, "green"));
+  }
+
+  for (let i = 0; i < lifeCount.blueCount; i++) {
+    let x = Math.random() * canvas.width;
+    let y = Math.random() * canvas.height;
+    particles.push(new Particle(x, y, "blue"));
+  }
+
+  for (let i = 0; i < lifeCount.redCount; i++) {
+    x = Math.random() * canvas.width;
+    y = Math.random() * canvas.height;
+    particles.push(new Particle(x, y, "red"));
+  }
+
+  setInterval(() => {
+    let x = Math.random() * canvas.width;
+    let y = Math.random() * canvas.height;
+    particles.push(new Particle(x, y, "green"));
+    lifeCount.greenCount++;
+  }, 100);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    console.log(lifeCount);
+
+    greenCount.textContent = lifeCount.greenCount;
+    blueCount.textContent = lifeCount.blueCount;
+    redCount.textContent = lifeCount.redCount;
+
+    for (let i1 = particles.length - 1; i1 >= 0; i1--) {
+      let p1 = particles[i1];
+      p1.update(ctx);
+
+      if (p1.life <= 0) {
+        particles.splice(i1, 1);
+        if (p1.color == "blue") {
+          lifeCount.blueCount--;
+        } else if (p1.color == "green") {
+          lifeCount.greenCount--;
+        } else if (p1.color == "red") {
+          lifeCount.redCount--;
+        }
+        continue;
+      }
+
+      for (let i2 = particles.length - 1; i2 >= 0; i2--) {
+        if (i1 === i2) continue;
+        let p2 = particles[i2];
+
+        let dist = distanceBetweenTwoParticles(p1, p2);
+        if (dist.dist < p1.radius) {
+          if (p1.color == "blue" && p2.color == "green") {
+            particles.splice(i2, 1);
+            particles.push(new Particle(p1.x, p1.y, "blue"));
+
+            lifeCount.greenCount--;
+            lifeCount.blueCount++;
+
+            p1.life = 500;
+            p1.foodConsumed = 0;
+          } else if (p1.color == "blue" && p2.color == "red") {
+            particles.splice(i1, 1);
+            lifeCount.blueCount--;
+
+            p2.life = 500;
+            p2.foodConsumed++;
+
+            if (p2.foodConsumed == 3) {
+              particles.push(new Particle(p2.x, p2.y, "red"));
+              lifeCount.redCount++;
+              p2.foodConsumed = 0;
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  animate();
+});
