@@ -1,19 +1,30 @@
+// 0 - red
+// 1 - yellow
+// 2 - green
+// 3 - blue
+// 4 - orange
+// 5 - white
+
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
-canvas.height = innerHeight * 0.9;
-canvas.width = canvas.height;
+canvas.width = 500;
+canvas.height = 500;
+
+const UNIVERSAL_FRICTION = 0.005;
 
 class Particle {
-  constructor(x, y, color) {
+  constructor(x, y, color, colorIndex) {
     this.x = x;
     this.y = y;
     this.color = color;
-    this.radius = 10;
+    this.colorIndex = colorIndex;
+    this.radius = 5;
     this.vx = 0;
     this.vy = 0;
-    this.ax = 0;
-    this.ay = 0;
+    this.maxVel = 1;
+    this.fx = 0;
+    this.fy = 0;
   }
   draw(ctx) {
     ctx.beginPath();
@@ -22,75 +33,136 @@ class Particle {
     ctx.fill();
     ctx.closePath();
   }
+
   update(ctx) {
     this.draw(ctx);
-    this.vx += this.ax;
-    this.vy += this.ay;
+    this.vx += this.fx;
+    this.vy += this.fy;
     this.x += this.vx;
     this.y += this.vy;
+
+    // max vel
+    if (this.vx > this.maxVel) {
+      this.vx = this.maxVel;
+    } else if (this.vx < -this.maxVel) {
+      this.vx = -this.maxVel;
+    }
+    if (this.vy > this.maxVel) {
+      this.vy = this.maxVel;
+    } else if (this.vy < -this.maxVel) {
+      this.vy = -this.maxVel;
+    }
+    // universal friction
+    if (this.vx >= UNIVERSAL_FRICTION) {
+      this.vx -= UNIVERSAL_FRICTION;
+    } else if (this.vx <= -UNIVERSAL_FRICTION) {
+      this.vx += UNIVERSAL_FRICTION;
+    } else {
+      this.vx = 0;
+    }
+
+    if (this.vy >= UNIVERSAL_FRICTION) {
+      this.vy -= UNIVERSAL_FRICTION;
+    } else if (this.vy <= -UNIVERSAL_FRICTION) {
+      this.vy += UNIVERSAL_FRICTION;
+    } else {
+      this.vy = 0;
+    }
+
+    // round world
+    if (this.x > canvas.width) {
+      this.x = 0;
+    } else if (this.x < 0) {
+      this.x = canvas.width;
+    }
+    if (this.y > canvas.height) {
+      this.y = 0;
+    } else if (this.y < 0) {
+      this.y = canvas.height;
+    }
   }
 }
 
-let particles = [];
+const particles = [];
 
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 100; i++) {
   let x = Math.random() * canvas.width;
   let y = Math.random() * canvas.height;
-  particles.push(new Particle(x, y, "red"));
+  particles.push(new Particle(x, y, "red", 0));
+}
+
+for (let i = 0; i < 100; i++) {
+  let x = Math.random() * canvas.width;
+  let y = Math.random() * canvas.height;
+  particles.push(new Particle(x, y, "blue", 1));
+}
+
+for (let i = 0; i < 100; i++) {
+  let x = Math.random() * canvas.width;
+  let y = Math.random() * canvas.height;
+  particles.push(new Particle(x, y, "green", 2));
 }
 
 function animate() {
   requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   for (let i1 = 0; i1 < particles.length; i1++) {
     let p1 = particles[i1];
     p1.update(ctx);
+
     let fx = 0;
     let fy = 0;
-    for (let i2 = 0; i2 < particles.length; i2++) {
-      if (i1 == i2) continue;
-      let p2 = particles[i2];
-      let dist = distanceBetweenTwoParticles(p1, p2);
-      let force = forceBetweenTwoParticles(p1, p2);
-      if (dist.dist > p1.radius * 1.1 && dist.dist < 50) {
-        fx += force.forceX;
-        fy += force.forceY;
-      } else if (dist.dist <= p1.radius * 1.1) {
-        fx = -fx;
-        fy = -fy;
-      } else if (dist.dist >= 50) {
-        fx = 0;
-        fy = 0;
-      }
 
-      //   if (dist.dist < p1.radius * 1.1) {
-      //     // repel
-      //   } else if (dist.dist < 30 && dist.dist >= p1.radius * 1.1) {
-      //     // attract
-      //   } else {
-      //     // do nothing
-      //   }
+    // interaction between particles
+    for (let i2 = 0; i2 < particles.length; i2++) {
+      if (i1 == i2) {
+        continue;
+      }
+      let p2 = particles[i2];
+      let dist = distance(p1, p2);
+      let f = force(p1, p2);
+      if (dist.dist < p1.radius * 5) {
+        fx -= f.forceX * 3;
+        fy -= f.forceY * 3;
+      } else if (dist.dist >= p1.radius * 5 && dist.dist < 150) {
+        if (p1.color == "red" && p2.color == "yellow") {
+          fx -= f.forceX;
+          fy -= f.forceY;
+        } else if (p1.color == "yellow" && p2.color == "red") {
+          fx += f.forceX * 10;
+          fy += f.forceY * 10;
+        } else {
+          fx += f.forceX;
+          fy += f.forceY;
+        }
+      }
     }
-    p1.ax = fx;
-    p1.ay = fy;
+    p1.fx = fx;
+    p1.fy = fy;
   }
 }
 
+const interactionMatrix = [
+  [1, -1, 1],
+  [1, 5, 1],
+  [1, 1, 1],
+];
+
 animate();
 
-// force & acceleration inter-changeable
-function forceBetweenTwoParticles(p1, p2) {
-  let dist = distanceBetweenTwoParticles(p1, p2);
-  let force = 1 / dist.sqDist;
-  let forceX = (dist.xDist / dist.dist) * force;
-  let forceY = (dist.yDist / dist.dist) * force;
-  return { force, forceX, forceY };
+function force(p1, p2) {
+  let { xDist, yDist, sqDist, dist } = distance(p1, p2);
+  let force = 10 / sqDist;
+  let forceX = (xDist / dist) * force;
+  let forceY = (yDist / dist) * force;
+  return { forceX, forceY, force };
 }
 
-function distanceBetweenTwoParticles(p1, p2) {
+function distance(p1, p2) {
   let xDist = p2.x - p1.x;
   let yDist = p2.y - p1.y;
-  let sqDist = Math.pow(xDist, 2) + Math.pow(yDist, 2);
+  let sqDist = xDist * xDist + yDist * yDist;
   let dist = Math.sqrt(sqDist);
-  return { dist, sqDist, xDist, yDist };
+  return { xDist, yDist, sqDist, dist };
 }
