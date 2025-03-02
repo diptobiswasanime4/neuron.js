@@ -19,7 +19,7 @@ class Particle {
     this.y = y;
     this.color = color;
     this.colorIndex = colorIndex;
-    this.radius = 5;
+    this.radius = 2;
     this.vx = 0;
     this.vy = 0;
     this.maxVel = 1;
