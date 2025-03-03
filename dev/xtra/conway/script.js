@@ -4,7 +4,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = 500;
 canvas.height = 500;
 
-const GRID_SIDE = 25;
+const GRID_SIDE = 10;
 const GRID_ROWS = canvas.height / GRID_SIDE;
 const GRID_COLS = canvas.width / GRID_SIDE;
 
@@ -23,8 +23,6 @@ let nextGrid = [];
 
 initializeGrid();
 drawGrid();
-
-console.log(grid);
 
 function neighborCount(i, j) {
   let count = 0;
@@ -96,8 +94,6 @@ function updateGrid() {
   nextGrid = grid.map((row) => [...row]);
   for (let i = 0; i < GRID_COLS; i++) {
     for (let j = 0; j < GRID_ROWS; j++) {
-      console.log(i, j, neighborCount(i, j));
-
       // living cell dies
       if (grid[i][j] == 1) {
         if (neighborCount(i, j) < 2 || neighborCount(i, j) > 3) {
